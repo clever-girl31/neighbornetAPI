@@ -1,12 +1,12 @@
 const { Schema } = require('mongoose')
-const { User, Thoughts } = require('../models')
+const { User, Thought } = require('../models')
 
 module.exports = {
   // get all users
   async getAllUsers(req, res) {
     try {
-      const users = User.find();
-      res.json(users);
+      const users = await User.find();
+      return res.json(users);
     } catch (err) {
       console.log(err);
       res.status(500).json(err);
@@ -15,11 +15,11 @@ module.exports = {
   // get one user by id
   async getOneUser(req, res) {
     try {
-      const user = User.findOne({ _id: req.params.userId});
+      const user = await User.findOne({ _id: req.params.userId});
       if (!user) {
         res.status(404).json({message: 'user not found'});
       }
-      res.json(user);
+      return res.json(user);
     } catch(err) {
       console.log(err);
       res.status(500).json(err)
@@ -28,8 +28,8 @@ module.exports = {
   // create new user
   async createUser(req, res) {
     try {
-      const newUser = User.create(req.body);
-      res.json(newUser);
+      const newUser = await User.create(req.body);
+      return res.json(newUser);
     } catch(err) {
       console.log(err);
       res.status(500).json(err)
@@ -38,7 +38,7 @@ module.exports = {
   // update user by id
   async updateUser(req, res) {
     try {
-      const user = User.findOneAndUpdate(
+      const user = await User.findOneAndUpdate(
       {_id: req.params.userId},
       {$set: req.body},
       {runValidators: true, new: true}
@@ -46,7 +46,7 @@ module.exports = {
     if(!user) {
       res.status(404).json({message: "user not found"})
     }
-    res.json(user);
+    return res.json(user);
     } catch(err) {
       console.log(err);
       res.status(500).json(err)

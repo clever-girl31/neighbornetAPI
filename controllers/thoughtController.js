@@ -1,12 +1,12 @@
 const { ObjectId } = require('mongoose').Types;
-const { User, Thoughts } = require('../models')
+const { User, Thought } = require('../models')
 
 module.exports = {
   // get all thoughts
   async getAllThoughts(req, res) {
     try {
-      const thoughts = await Thoughts.find();
-      res.json(thoughts);
+      const thoughts = await Thought.find();
+      return res.json(thoughts);
     } catch (err) {
       console.log(err);
       return res.status(500).json(err);
@@ -21,7 +21,7 @@ module.exports = {
         return res.status(404).json({ message: "thought not found"})
       }
 
-      res.json(thought)
+      return res.json(thought)
     } catch(err) {
       console.log(err);
       return res.status(500).jsonj(err);
@@ -37,7 +37,7 @@ module.exports = {
       { $push: { thoughts: newThought._id } },
       { new: true }
       )
-      res.json(newThought);
+      return res.json(newThought);
     } catch (err) {
       res.status(500).json(err)
     }
@@ -54,7 +54,7 @@ module.exports = {
       if (!thought) {
         res.status(404).json({ message: "no thought with this id. this id is thoughtless"})
       }
-      res.json(thought)
+      return res.json(thought)
     } catch(err) {
       console.log(err);
       res.status(500).json(err)
@@ -68,6 +68,7 @@ module.exports = {
       if (!thought) {
         res.status(404).json({message: "no thought with that id"});
       }
+      return res.json({message: "deleted Thought"})
     } catch (err) {
       console.log(err);
       res.status(500).json(err)
@@ -76,7 +77,7 @@ module.exports = {
   // create reaction
   async reactToThought(req, res) {
     try {
-      const reaction = await Thoughts.findOneAndUpdate(
+      const reaction = await Thought.findOneAndUpdate(
         { _id: req.params.thoughtId },
         { $set: req.body },
         { runValidators: true, new: true}
@@ -84,7 +85,7 @@ module.exports = {
       if(!reaction) {
         res.status(404).json({ message: "thought not found"})
       }
-      res.json(reaction)
+      return res.json(reaction)
     } catch (err) {
       console.log(err);
       res.status(500).json(err)
@@ -93,7 +94,7 @@ module.exports = {
   // delete a reaction
   async deleteReaction(req, res) {
     try {
-    const reaction = await Thoughts.findOneAndDelete(
+    const reaction = await Thought.findOneAndDelete(
       { _id: req.params.reactionID}
     );
     if(!reaction) {
