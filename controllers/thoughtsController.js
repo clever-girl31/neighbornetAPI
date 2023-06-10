@@ -28,7 +28,7 @@ module.exports = {
     }
   },
   // create new thought, push author/user's _id to a/u's thoughts array field
-  async createThough(req, res) {
+  async createThought(req, res) {
     try {
       const newThought = await Thought.create(req.body);
       const userId = req.userId;
@@ -71,6 +71,38 @@ module.exports = {
     } catch (err) {
       console.log(err);
       res.status(500).json(err)
+    }
+  },
+  // create reaction
+  async reactToThought(req, res) {
+    try {
+      const reaction = await Thoughts.findOneAndUpdate(
+        { _id: req.params.thoughtId },
+        { $set: req.body },
+        { runValidators: true, new: true}
+      );
+      if(!reaction) {
+        res.status(404).json({ message: "thought not found"})
+      }
+      res.json(reaction)
+    } catch (err) {
+      console.log(err);
+      res.status(500).json(err)
+    }
+  },
+  // delete a reaction
+  async deleteReaction(req, res) {
+    try {
+    const reaction = await Thoughts.findOneAndDelete(
+      { _id: req.params.reactionID}
+    );
+    if(!reaction) {
+      res.status(404).json({message: 'reaction not found'})
+    }
+    res.json(reaction);
+    } catch(err) {
+    console.log(err);
+    res.status(500).json(err)
     }
   }
 }
