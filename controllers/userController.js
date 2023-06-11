@@ -1,11 +1,11 @@
-const { Schema } = require('mongoose')
-const { User, Thought } = require('../models')
+const User = require('../models/User')
 
 module.exports = {
   // get all users
   async getAllUsers(req, res) {
     try {
       const users = await User.find();
+      console.log(users)
       return res.json(users);
     } catch (err) {
       console.log(err);
@@ -38,7 +38,7 @@ module.exports = {
   // update user by id
   async updateUser(req, res) {
     try {
-      const user = await User.findOneAndUpdate(
+      const user = await User.updateOne(
       {_id: req.params.userId},
       {$set: req.body},
       {runValidators: true, new: true}
@@ -46,6 +46,7 @@ module.exports = {
     if(!user) {
       res.status(404).json({message: "user not found"})
     }
+    console.log(req.params.userId, req.body)
     return res.json(user);
     } catch(err) {
       console.log(err);
@@ -59,7 +60,7 @@ module.exports = {
       if(!user) {
         res.status(404).json({message: "user not found"})
       }
-      res.json({message: `student ${_id} deleted`})
+      res.json({message: `user deleted`})
     } catch(err) {
       console.log(err);
       res.status(500).json(err)

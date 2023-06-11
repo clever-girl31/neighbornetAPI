@@ -18,7 +18,7 @@ router
   .get(getOneThought)
   .put(updateThought)
   .delete(deleteThought)
-  .put(reactToThought)
+  .post(reactToThought)
   .delete(deleteReaction)
 
   module.exports = router;
