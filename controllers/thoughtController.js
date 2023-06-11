@@ -85,15 +85,19 @@ module.exports = {
   // create reaction
   async reactToThought(req, res) {
     try {
-      const reaction = await Thought.findOneAndUpdate(
-        { _id: req.params.thoughtId },
-        { $set: req.body },
-        { runValidators: true, new: true}
-      );
-      if(!reaction) {
+      const { reactionBody, username } = req.body
+      const thoughtId = req.params.thoughtId
+
+      console.log(thoughtId)
+      const thought = await Thought.findOne({ _id: thoughtId})
+      
+      if(!thought) {
         res.status(404).json({ message: "thought not found"})
       }
-      return res.json(reaction)
+
+      thought.reactions.push({ reactionBody, username })
+      const reactedThought = await thought.save()
+      return res.json(reactedThought)
     } catch (err) {
       console.log(err);
       res.status(500).json(err)
@@ -102,13 +106,19 @@ module.exports = {
   // delete a reaction
   async deleteReaction(req, res) {
     try {
-    const reaction = await Thought.findOneAndDelete(
-      { _id: req.params.reactionID}
-    );
+    const { thoughtId } = req.params
+    const { reactionId } = req.body;
+
+    const thought = await Thought.findOne({ _id: thoughtId});
+    const reaction = thought.reactions.id(reactionId);
+
     if(!reaction) {
       res.status(404).json({message: 'reaction not found'})
     }
-    res.json(reaction);
+    reaction.deleteOne();
+    await thought.save();
+
+    return res.json({message: "reaction deleted"});
     } catch(err) {
     console.log(err);
     res.status(500).json(err)
