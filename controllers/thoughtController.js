@@ -31,14 +31,22 @@ module.exports = {
   async createThought(req, res) {
     try {
       const newThought = await Thought.create(req.body);
-      const userId = req.userId;
-      const user = await User.findByIdAndUpdate(
-      userId,
+      const username = req.body.username;
+      
+      const user = await User.findOne({ username });
+      if (!user) {
+        return res.status(404).json({message: 'user not found'})
+      }
+      const userId = user._id
+      
+      const updatedUser = await User.findOneAndUpdate(
+      { _id: userId },
       { $push: { thoughts: newThought._id } },
       { new: true }
       )
-      return res.json(newThought);
+      return res.json({newThought, updatedUser});
     } catch (err) {
+      console.log(err)
       res.status(500).json(err)
     }
   },
